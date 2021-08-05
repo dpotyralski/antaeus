@@ -7,11 +7,14 @@
 
 package io.pleo.antaeus.app
 
+import com.github.kagkarlsson.scheduler.SchedulerClient
 import getPaymentProvider
+import io.pleo.antaeus.core.infrastructure.DateTimeProvider
 import io.pleo.antaeus.core.services.BillingScheduler
 import io.pleo.antaeus.core.services.BillingService
 import io.pleo.antaeus.core.services.CustomerService
 import io.pleo.antaeus.core.services.InvoiceService
+import io.pleo.antaeus.core.services.PaymentChargeTask
 import io.pleo.antaeus.core.services.SchedulerConfiguration
 import io.pleo.antaeus.data.AntaeusDal
 import io.pleo.antaeus.data.CustomerTable
@@ -28,6 +31,7 @@ import org.sqlite.SQLiteDataSource
 import setupInitialData
 import java.io.File
 import java.sql.Connection
+import java.time.Clock
 
 fun main() {
     // The tables to create in the database.
@@ -60,17 +64,26 @@ fun main() {
 
     // Get third parties
     val paymentProvider = getPaymentProvider()
+    val dateTimeProvider = DateTimeProvider(Clock.systemDefaultZone())
 
     // Create core services
     val invoiceService = InvoiceService(dal = dal)
     val customerService = CustomerService(dal = dal)
 
+    val schedulerClient: SchedulerClient = SchedulerClient.Builder.create(dataSource).build()
     // This is _your_ billing service to be included where you see fit
-    val billingService = BillingService(paymentProvider = paymentProvider)
-    val billingSchedulerTask = BillingScheduler("50 27 17 * * *", billingService = billingService)
+    val billingService = BillingService(
+        dateTimeProvider = dateTimeProvider,
+        schedulerClient = schedulerClient,
+        invoiceService = invoiceService
+    )
+    val billingSchedulerTask = BillingScheduler(cronPattern = "33 04 18 * * *", billingService = billingService)
+    val paymentChargeTask = PaymentChargeTask()
+
     val schedulerConfiguration = SchedulerConfiguration(
         dataSource = dataSource,
-        onStartupScheduledTasks = listOf(billingSchedulerTask)
+        onStartupScheduledTasks = listOf(billingSchedulerTask),
+        onDemandSchedulerTasks = listOf(paymentChargeTask)
     )
 
     // Create REST web service

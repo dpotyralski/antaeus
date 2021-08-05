@@ -6,11 +6,12 @@ import javax.sql.DataSource
 
 class SchedulerConfiguration(
     dataSource: DataSource,
-    onStartupScheduledTasks: List<OnStartupScheduledTask<*>>
+    onStartupScheduledTasks: List<OnStartupScheduledTask<*>>,
+    onDemandSchedulerTasks: List<OnDemandSchedulerTask<*>>
 ) {
 
     val scheduler: Scheduler = Scheduler
-        .create(dataSource)
+        .create(dataSource, onDemandSchedulerTasks.map(OnDemandSchedulerTask<*>::getTask))
         .startTasks(onStartupScheduledTasks.map(OnStartupScheduledTask<*>::getTask))
         .pollingInterval(Duration.ofSeconds(1))
         .build()
