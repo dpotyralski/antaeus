@@ -78,7 +78,7 @@ fun main() {
         invoiceService = invoiceService
     )
     val billingSchedulerTask = BillingScheduler(cronPattern = "33 04 18 * * *", billingService = billingService)
-    val paymentChargeTask = PaymentChargeTask()
+    val paymentChargeTask = PaymentChargeTask(invoiceService = invoiceService, paymentProvider = paymentProvider)
 
     val schedulerConfiguration = SchedulerConfiguration(
         dataSource = dataSource,
