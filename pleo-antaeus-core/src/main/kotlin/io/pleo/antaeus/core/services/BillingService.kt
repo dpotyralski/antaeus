@@ -35,7 +35,7 @@ class BillingService(
             TaskInstance(
                 PaymentChargeTask.PAYMENT_CHARGE_TASK_NAME,
                 invoice.id.toString(),
-                invoice
+                InvoiceCharge(invoice)
             ), scheduleTime
         )
     }

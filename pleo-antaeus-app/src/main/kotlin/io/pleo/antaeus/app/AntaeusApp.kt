@@ -15,6 +15,7 @@ import io.pleo.antaeus.core.services.BillingService
 import io.pleo.antaeus.core.services.CustomerService
 import io.pleo.antaeus.core.services.InvoiceService
 import io.pleo.antaeus.core.services.PaymentChargeTask
+import io.pleo.antaeus.core.services.PaymentRecharger
 import io.pleo.antaeus.core.services.SchedulerConfiguration
 import io.pleo.antaeus.data.AntaeusDal
 import io.pleo.antaeus.data.CustomerTable
@@ -77,8 +78,14 @@ fun main() {
         schedulerClient = schedulerClient,
         invoiceService = invoiceService
     )
-    val billingSchedulerTask = BillingScheduler(cronPattern = "33 04 18 * * *", billingService = billingService)
-    val paymentChargeTask = PaymentChargeTask(invoiceService = invoiceService, paymentProvider = paymentProvider)
+
+    val paymentRecharger = PaymentRecharger(
+        dateTimeProvider = dateTimeProvider,
+        schedulerClient = schedulerClient
+    )
+
+    val billingSchedulerTask = BillingScheduler(cronPattern = "50 54 20 * * *", billingService = billingService)
+    val paymentChargeTask = PaymentChargeTask(invoiceService = invoiceService, paymentProvider = paymentProvider, paymentRecharger = paymentRecharger)
 
     val schedulerConfiguration = SchedulerConfiguration(
         dataSource = dataSource,

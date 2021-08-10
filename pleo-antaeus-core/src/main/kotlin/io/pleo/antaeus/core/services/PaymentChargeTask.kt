@@ -5,35 +5,35 @@ import com.github.kagkarlsson.scheduler.task.TaskInstance
 import com.github.kagkarlsson.scheduler.task.helper.OneTimeTask
 import com.github.kagkarlsson.scheduler.task.helper.Tasks
 import io.pleo.antaeus.core.external.PaymentProvider
-import io.pleo.antaeus.models.Invoice
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.Instant
 
 class PaymentChargeTask(
     private val invoiceService: InvoiceService,
-    private val paymentProvider: PaymentProvider
-) : OnDemandSchedulerTask<Invoice> {
+    private val paymentProvider: PaymentProvider,
+    private val paymentRecharger: PaymentRecharger
+) : OnDemandSchedulerTask<InvoiceCharge> {
 
     companion object {
         val logger: Logger = LoggerFactory.getLogger(PaymentChargeTask::class.java)
         const val PAYMENT_CHARGE_TASK_NAME = "paymentCharger"
     }
 
-    private val chargeRechargeTask: OneTimeTask<Invoice> =
-        Tasks.oneTime(PAYMENT_CHARGE_TASK_NAME, Invoice::class.java)
-            .execute { taskInstance: TaskInstance<Invoice>, _: ExecutionContext ->
-                val invoice = taskInstance.data
-                logger.info("Charging invoice: $invoice = at ${Instant.now()}")
-                if (paymentProvider.charge(invoice)) {
-                    invoiceService.markInvoiceAsPaid(invoice)
-                    logger.info("Invoice with id: ${invoice.id} was charged successfully")
+    private val chargeRechargeTask: OneTimeTask<InvoiceCharge> =
+        Tasks.oneTime(PAYMENT_CHARGE_TASK_NAME, InvoiceCharge::class.java)
+            .execute { taskInstance: TaskInstance<InvoiceCharge>, _: ExecutionContext ->
+                val invoiceCharge = taskInstance.data
+                logger.info("Charging invoice: ${invoiceCharge.invoice} = at ${Instant.now()}")
+                if (paymentProvider.charge(invoiceCharge.invoice)) {
+                    invoiceService.markInvoiceAsPaid(invoiceCharge.invoice)
+                    logger.info("Invoice with id: ${invoiceCharge.invoice.id} was charged successfully")
                 } else {
-                    //todo recharge payment ?
+                    paymentRecharger.recharge(invoiceCharge)
                 }
             }
 
-    override fun getTask(): OneTimeTask<Invoice> {
+    override fun getTask(): OneTimeTask<InvoiceCharge> {
         return chargeRechargeTask;
     }
 

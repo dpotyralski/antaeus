@@ -18,8 +18,9 @@ class PaymentChargeTaskTest {
 
     private val invoiceService = mockk<InvoiceService>(relaxUnitFun = true) {}
     private val paymentProvider = mockk<PaymentProvider> {}
+    private val paymentRecharger = mockk<PaymentRecharger> {}
 
-    private val paymentChargeTask = PaymentChargeTask(invoiceService, paymentProvider)
+    private val paymentChargeTask = PaymentChargeTask(invoiceService, paymentProvider, paymentRecharger)
 
     @Test
     fun `should mark pending invoice as paid when charged successfully`() {
@@ -30,7 +31,7 @@ class PaymentChargeTaskTest {
         every { paymentProvider.charge(invoice) } returns true
 
         //when
-        paymentChargeTask.getTask().execute(TaskInstance("test", "1", invoice), executionContext)
+        paymentChargeTask.getTask().execute(TaskInstance("test", "1", InvoiceCharge(invoice)), executionContext)
 
         //then
         verify {
