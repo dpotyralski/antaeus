@@ -1,6 +1,7 @@
 package io.pleo.antaeus.core.services
 
 import com.github.kagkarlsson.scheduler.task.ExecutionContext
+import com.github.kagkarlsson.scheduler.task.FailureHandler
 import com.github.kagkarlsson.scheduler.task.TaskInstance
 import io.mockk.confirmVerified
 import io.mockk.every
@@ -19,8 +20,9 @@ class PaymentChargeTaskTest {
     private val invoiceService = mockk<InvoiceService>(relaxUnitFun = true) {}
     private val paymentProvider = mockk<PaymentProvider> {}
     private val paymentRecharger = mockk<PaymentRecharger> {}
+    private val failureHandler = mockk<FailureHandler<InvoiceCharge>> {}
 
-    private val paymentChargeTask = PaymentChargeTask(invoiceService, paymentProvider, paymentRecharger)
+    private val paymentChargeTask = PaymentChargeTask(invoiceService, paymentProvider, paymentRecharger, failureHandler)
 
     @Test
     fun `should mark pending invoice as paid when charged successfully`() {
@@ -41,5 +43,6 @@ class PaymentChargeTaskTest {
         // no other calls were made
         confirmVerified(invoiceService)
     }
+
 }
 

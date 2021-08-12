@@ -1,6 +1,7 @@
 package io.pleo.antaeus.core.services
 
 import com.github.kagkarlsson.scheduler.task.ExecutionContext
+import com.github.kagkarlsson.scheduler.task.FailureHandler
 import com.github.kagkarlsson.scheduler.task.TaskInstance
 import com.github.kagkarlsson.scheduler.task.helper.OneTimeTask
 import com.github.kagkarlsson.scheduler.task.helper.Tasks
@@ -13,7 +14,8 @@ private val logger = KotlinLogging.logger {}
 class PaymentChargeTask(
     private val invoiceService: InvoiceService,
     private val paymentProvider: PaymentProvider,
-    private val paymentRecharger: PaymentRecharger
+    private val paymentRecharger: PaymentRecharger,
+    private val failureHandler: FailureHandler<InvoiceCharge>
 ) : OnDemandSchedulerTask<InvoiceCharge> {
 
     companion object {
@@ -22,6 +24,7 @@ class PaymentChargeTask(
 
     private val chargeRechargeTask: OneTimeTask<InvoiceCharge> =
         Tasks.oneTime(PAYMENT_CHARGE_TASK_NAME, InvoiceCharge::class.java)
+            .onFailure(failureHandler)
             .execute { taskInstance: TaskInstance<InvoiceCharge>, _: ExecutionContext ->
                 val invoiceCharge = taskInstance.data
                 logger.info("Charging invoice: ${invoiceCharge.invoice} = at ${Instant.now()}")
@@ -34,7 +37,7 @@ class PaymentChargeTask(
             }
 
     override fun getTask(): OneTimeTask<InvoiceCharge> {
-        return chargeRechargeTask;
+        return chargeRechargeTask
     }
 
 }
