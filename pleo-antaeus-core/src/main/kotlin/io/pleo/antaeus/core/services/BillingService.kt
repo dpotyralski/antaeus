@@ -4,20 +4,17 @@ import com.github.kagkarlsson.scheduler.SchedulerClient
 import com.github.kagkarlsson.scheduler.task.TaskInstance
 import io.pleo.antaeus.core.infrastructure.DateTimeProvider
 import io.pleo.antaeus.models.Invoice
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import mu.KotlinLogging
 import java.time.Instant
 import java.time.temporal.ChronoUnit
+
+private val logger = KotlinLogging.logger {}
 
 class BillingService(
     private val dateTimeProvider: DateTimeProvider,
     private val schedulerClient: SchedulerClient,
     private val invoiceService: InvoiceService
 ) {
-
-    companion object {
-        val logger: Logger = LoggerFactory.getLogger(BillingService::class.java)
-    }
 
     fun start() {
         logger.info("Invoice charging process started at: ${dateTimeProvider.now()}")

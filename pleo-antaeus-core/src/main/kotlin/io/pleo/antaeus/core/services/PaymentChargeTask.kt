@@ -5,9 +5,10 @@ import com.github.kagkarlsson.scheduler.task.TaskInstance
 import com.github.kagkarlsson.scheduler.task.helper.OneTimeTask
 import com.github.kagkarlsson.scheduler.task.helper.Tasks
 import io.pleo.antaeus.core.external.PaymentProvider
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import mu.KotlinLogging
 import java.time.Instant
+
+private val logger = KotlinLogging.logger {}
 
 class PaymentChargeTask(
     private val invoiceService: InvoiceService,
@@ -16,7 +17,6 @@ class PaymentChargeTask(
 ) : OnDemandSchedulerTask<InvoiceCharge> {
 
     companion object {
-        val logger: Logger = LoggerFactory.getLogger(PaymentChargeTask::class.java)
         const val PAYMENT_CHARGE_TASK_NAME = "paymentCharger"
     }
 
