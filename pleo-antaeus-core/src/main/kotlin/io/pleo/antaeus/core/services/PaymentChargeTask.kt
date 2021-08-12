@@ -26,11 +26,21 @@ class PaymentChargeTask(
         Tasks.oneTime(PAYMENT_CHARGE_TASK_NAME, InvoiceCharge::class.java)
             .onFailure(failureHandler)
             .execute { taskInstance: TaskInstance<InvoiceCharge>, _: ExecutionContext ->
+
                 val invoiceCharge = taskInstance.data
-                logger.info("Charging invoice: ${invoiceCharge.invoice} = at ${Instant.now()}")
-                if (paymentProvider.charge(invoiceCharge.invoice)) {
-                    invoiceService.markInvoiceAsPaid(invoiceCharge.invoice)
-                    logger.info("Invoice with id: ${invoiceCharge.invoice.id} was charged successfully")
+                val invoice = invoiceCharge.invoice
+
+                if (invoiceCharge.retryCounter >= 3) {
+                    logger.info("Retry limit for invoice: $invoice has been reached, marking as unpaid.")
+                    invoiceService.markInvoiceAsUnpaid(invoice)
+                    return@execute
+                }
+
+                logger.info("Charging invoice: $invoice = at ${Instant.now()}")
+
+                if (paymentProvider.charge(invoice)) {
+                    invoiceService.markInvoiceAsPaid(invoice)
+                    logger.info("Invoice with id: ${invoice.id} was charged successfully")
                 } else {
                     paymentRecharger.recharge(invoiceCharge)
                 }

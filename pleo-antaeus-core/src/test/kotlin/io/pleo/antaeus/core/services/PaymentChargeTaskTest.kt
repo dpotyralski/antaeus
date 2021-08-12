@@ -1,6 +1,5 @@
 package io.pleo.antaeus.core.services
 
-import com.github.kagkarlsson.scheduler.task.ExecutionContext
 import com.github.kagkarlsson.scheduler.task.FailureHandler
 import com.github.kagkarlsson.scheduler.task.TaskInstance
 import io.mockk.confirmVerified
@@ -27,13 +26,11 @@ class PaymentChargeTaskTest {
     @Test
     fun `should mark pending invoice as paid when charged successfully`() {
         //given
-        val executionContext = mockk<ExecutionContext> {}
-
-        val invoice = Invoice(1, 1, Money(BigDecimal("12"), Currency.EUR), InvoiceStatus.PENDING)
+        val invoice = createTestInvoice()
         every { paymentProvider.charge(invoice) } returns true
 
         //when
-        paymentChargeTask.getTask().execute(TaskInstance("test", "1", InvoiceCharge(invoice)), executionContext)
+        paymentChargeTask.getTask().execute(TaskInstance("test", "1", InvoiceCharge(invoice)), mockk())
 
         //then
         verify {
@@ -43,6 +40,27 @@ class PaymentChargeTaskTest {
         // no other calls were made
         confirmVerified(invoiceService)
     }
+
+    @Test
+    fun `should mark pending invoice as unpaid when retry limit reached`() {
+        //given
+        val invoice = createTestInvoice()
+        val invoiceCharge = InvoiceCharge(invoice)
+        invoiceCharge.retryCounter = 3
+
+        //when
+        paymentChargeTask.getTask().execute(TaskInstance("test", "1", invoiceCharge), mockk())
+
+        //then
+        verify {
+            invoiceService.markInvoiceAsUnpaid(invoice)
+        }
+
+        // no other calls were made
+        confirmVerified(invoiceService)
+    }
+
+    private fun createTestInvoice() = Invoice(1, 1, Money(BigDecimal("12"), Currency.EUR), InvoiceStatus.PENDING)
 
 }
 
