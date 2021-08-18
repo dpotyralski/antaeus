@@ -6,6 +6,7 @@ services:
       context: ../../../../
       dockerfile: Dockerfile
     environment:
+      INVOICE_PAYMENT_CRONE: "30 35 21 * * *"
       DB_HOST: dbt.host
       DB_PORT: 5432
       DB_USERNAME: antaeus

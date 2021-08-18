@@ -1,4 +1,3 @@
-
 import io.pleo.antaeus.core.external.PaymentProvider
 import io.pleo.antaeus.data.AntaeusDal
 import io.pleo.antaeus.models.Currency
@@ -37,4 +36,8 @@ internal fun getPaymentProvider(): PaymentProvider {
                 return Random.nextBoolean()
         }
     }
+}
+
+internal fun getPaymentCronConfiguration(): String {
+    return System.getenv("INVOICE_PAYMENT_CRONE")
 }

@@ -8,6 +8,7 @@
 package io.pleo.antaeus.app
 
 import com.github.kagkarlsson.scheduler.SchedulerClient
+import getPaymentCronConfiguration
 import getPaymentProvider
 import io.pleo.antaeus.core.infrastructure.DateTimeProvider
 import io.pleo.antaeus.core.services.BillingScheduler
@@ -78,7 +79,7 @@ fun main() {
         schedulerClient = schedulerClient,
         invoiceService = invoiceService
     )
-    val billingSchedulerTask = BillingScheduler(cronPattern = "30 35 21 * * *", billingService = billingService)
+    val billingSchedulerTask = BillingScheduler(cronPattern = getPaymentCronConfiguration(), billingService = billingService)
 
     val paymentRecharger = PaymentRecharger(
         dateTimeProvider = dateTimeProvider,
