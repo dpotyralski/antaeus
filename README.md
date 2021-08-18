@@ -29,26 +29,10 @@ Open the project using your favorite text editor. If you are using IntelliJ, you
 
 ### Running
 
-There are 2 options for running Anteus. You either need libsqlite3 or docker. Docker is easier but requires some docker knowledge. We do recommend docker though.
+!! Important note, you need to build an app first !!
 
-*Running Natively*
-
-Native java with sqlite (requires libsqlite3):
-
-If you use homebrew on MacOS `brew install sqlite`.
-
-```
-./gradlew run
-```
-
-*Running through docker*
-
-Install docker for your platform
-
-```
-docker build -t antaeus
-docker run antaeus
-```
+To start the app all you need to have is a docker installed locally. Please use following command to start it with all needed dependencies:
+`docker-compose -f ./antaeus/pleo-antaeus-blackbox-test/src/test/resources/bb-docker-compose.yml up --build`
 
 ### App Structure
 The code given is structured as follows. Feel free however to modify the structure to fit your needs.
@@ -83,6 +67,6 @@ The code given is structured as follows. Feel free however to modify the structu
 * [kotlin-logging](https://github.com/MicroUtils/kotlin-logging) - Simple logging framework for Kotlin
 * [JUnit 5](https://junit.org/junit5/) - Testing framework
 * [Mockk](https://mockk.io/) - Mocking library
-* [Sqlite3](https://sqlite.org/index.html) - Database storage engine
+* [Postgresql](https://www.postgresql.org/) - Object relational database
 
 Happy hacking 😁!

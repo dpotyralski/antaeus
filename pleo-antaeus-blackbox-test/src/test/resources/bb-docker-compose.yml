@@ -1,0 +1,25 @@
+version: "3.3"
+
+services:
+  pleo-antaeus:
+    build:
+      context: ../../../../
+      dockerfile: Dockerfile
+    environment:
+      DB_HOST: dbt.host
+      DB_PORT: 5432
+      DB_USERNAME: antaeus
+      DB_PASSWORD: password1
+    ports:
+      - "7000"
+    links:
+      - database:dbt.host
+
+  database:
+    image: postgres:9.6.23
+    environment:
+      POSTGRES_USER: antaeus
+      POSTGRES_PASSWORD: password1
+      POSTGRES_DB: antaeus-db
+    ports:
+      - "5432"

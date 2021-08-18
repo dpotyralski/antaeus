@@ -19,6 +19,8 @@ allprojects {
     }
 
     tasks.withType<Test> {
-        useJUnitPlatform()
+        useJUnitPlatform() {
+            excludeTags("black-box")
+        }
     }
 }

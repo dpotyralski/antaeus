@@ -29,9 +29,8 @@ import org.jetbrains.exposed.sql.StdOutSqlLogger
 import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.sqlite.SQLiteDataSource
+import org.postgresql.ds.PGSimpleDataSource
 import setupInitialData
-import java.io.File
 import java.sql.Connection
 import java.time.Clock
 
@@ -39,10 +38,10 @@ fun main() {
     // The tables to create in the database.
     val tables = arrayOf(InvoiceTable, CustomerTable, ScheduledTasks)
 
-    val dbFile: File = File.createTempFile("antaeus-db", ".sqlite")
-
-    val dataSource = SQLiteDataSource()
-    dataSource.url = "jdbc:sqlite:${dbFile.absolutePath}"
+    val dataSource = PGSimpleDataSource()
+    dataSource.setUrl("jdbc:postgresql://${System.getenv("DB_HOST")}:${System.getenv("DB_PORT")}/antaeus-db")
+    dataSource.user = System.getenv("DB_USERNAME")
+    dataSource.password = System.getenv("DB_PASSWORD")
 
     // Connect to the database and create the needed tables. Drop any existing data.
     val db = Database
