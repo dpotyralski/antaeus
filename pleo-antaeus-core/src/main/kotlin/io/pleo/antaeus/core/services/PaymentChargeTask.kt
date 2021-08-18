@@ -19,7 +19,7 @@ class PaymentChargeTask(
 ) : OnDemandSchedulerTask<InvoiceCharge> {
 
     companion object {
-        const val PAYMENT_CHARGE_TASK_NAME = "paymentCharger"
+        const val PAYMENT_CHARGE_TASK_NAME = "payment-charge-task"
     }
 
     private val chargeRechargeTask: OneTimeTask<InvoiceCharge> =

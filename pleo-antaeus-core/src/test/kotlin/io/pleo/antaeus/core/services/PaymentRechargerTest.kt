@@ -38,7 +38,7 @@ class PaymentRechargerTest {
                     PaymentChargeTask.PAYMENT_CHARGE_TASK_NAME,
                     "invoice-1-reschedule-attempt-1",
                     invoiceCharge
-                ), Instant.parse("2021-08-10T10:15:40.00Z")
+                ), Instant.parse("2021-08-10T10:15:31.00Z")
             )
         }
 

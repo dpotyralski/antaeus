@@ -50,11 +50,11 @@ class BillingServiceTest {
             invoiceService.fetchPending()
             schedulerClient.schedule(
                 TaskInstance<InvoiceCharge>(PaymentChargeTask.PAYMENT_CHARGE_TASK_NAME, "1", InvoiceCharge(testInvoice)),
-                dateTimeProvider.now()
+                Instant.parse("2021-08-10T10:15:30.00Z")
             )
             schedulerClient.schedule(
                 TaskInstance<InvoiceCharge>(PaymentChargeTask.PAYMENT_CHARGE_TASK_NAME, "2", InvoiceCharge(testInvoice2)),
-                dateTimeProvider.now().plusSeconds(10)
+                Instant.parse("2021-08-10T10:15:31.00Z")
             )
         }
 

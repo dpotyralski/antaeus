@@ -14,7 +14,7 @@ class PaymentRecharger(
 ) {
 
     fun recharge(invoiceCharge: InvoiceCharge) {
-        val newExecutionTime = dateTimeProvider.now().plusSeconds(10)
+        val newExecutionTime = dateTimeProvider.now().plusSeconds(1)
         logger.info("Payment for invoice ${invoiceCharge.invoice} rescheduled for $newExecutionTime")
         invoiceCharge.increaseRetryCounter()
         schedulerClient.schedule(

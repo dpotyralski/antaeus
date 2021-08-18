@@ -22,7 +22,7 @@ class BillingService(
         invoiceService.fetchPending()
             .forEach { invoice ->
                 this.scheduleInvoiceCharge(scheduleTime, invoice)
-                scheduleTime = scheduleTime.plus(10, ChronoUnit.SECONDS)
+                scheduleTime = scheduleTime.plus(1, ChronoUnit.SECONDS)
             }
     }
 
