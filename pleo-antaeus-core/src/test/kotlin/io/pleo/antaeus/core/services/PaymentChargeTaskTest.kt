@@ -18,7 +18,7 @@ class PaymentChargeTaskTest {
 
     private val invoiceService = mockk<InvoiceService>(relaxUnitFun = true) {}
     private val paymentProvider = mockk<PaymentProvider> {}
-    private val paymentRecharger = mockk<PaymentRecharger> {}
+    private val paymentRecharger = mockk<PaymentRecharger>(relaxUnitFun = true) {}
     private val failureHandler = mockk<FailureHandler<InvoiceCharge>> {}
 
     private val paymentChargeTask = PaymentChargeTask(invoiceService, paymentProvider, paymentRecharger, failureHandler)
@@ -35,6 +35,24 @@ class PaymentChargeTaskTest {
         //then
         verify {
             invoiceService.markInvoiceAsPaid(invoice)
+        }
+
+        // no other calls were made
+        confirmVerified(invoiceService)
+    }
+
+    @Test
+    fun `should call recharge process in case of not successful attempt`() {
+        //given
+        val invoice = createTestInvoice()
+        every { paymentProvider.charge(invoice) } returns false
+
+        //when
+        paymentChargeTask.getTask().execute(TaskInstance("test", "1", InvoiceCharge(invoice)), mockk())
+
+        //then
+        verify {
+            paymentRecharger.recharge(InvoiceCharge(invoice))
         }
 
         // no other calls were made
