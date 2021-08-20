@@ -5,7 +5,11 @@ import io.pleo.antaeus.models.Invoice
 import io.pleo.antaeus.models.InvoiceStatus
 import io.pleo.antaeus.models.Money
 import java.math.BigDecimal
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import kotlin.random.Random
+
 
 // This will create all schemas and setup initial data
 internal fun setupInitialData(dal: AntaeusDal) {
@@ -33,11 +37,23 @@ internal fun setupInitialData(dal: AntaeusDal) {
 internal fun getPaymentProvider(): PaymentProvider {
     return object : PaymentProvider {
         override fun charge(invoice: Invoice): Boolean {
-                return Random.nextBoolean()
+            return Random.nextBoolean()
         }
     }
 }
 
 internal fun getPaymentCronConfiguration(): String {
+    val testRun = System.getenv("INVOICE_PAYMENT_TEST_RUN")!!.toBoolean()
+    if (testRun) {
+        return createCronExpressionWhichExecutesAfterAppStart()
+    }
     return System.getenv("INVOICE_PAYMENT_CRONE")
+}
+
+private fun createCronExpressionWhichExecutesAfterAppStart(): String {
+    val cronExpressionAfterAppStart =
+        DateTimeFormatter.ofPattern("s m H")
+            .withZone(ZoneId.systemDefault())
+            .format(Instant.now().plusSeconds(10))
+    return "$cronExpressionAfterAppStart * * *"
 }

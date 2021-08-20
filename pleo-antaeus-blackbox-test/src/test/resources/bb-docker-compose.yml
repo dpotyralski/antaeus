@@ -6,6 +6,7 @@ services:
       context: ../../../../
       dockerfile: Dockerfile
     environment:
+      INVOICE_PAYMENT_TEST_RUN: "true"
       INVOICE_PAYMENT_CRONE: "0 0 8 1 * ?" # 1st day of every month at 8:00 AM
       DB_HOST: dbt.host
       DB_PORT: 5432
